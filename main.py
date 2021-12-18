@@ -159,32 +159,6 @@ class MyHeap:
 
 def main():
     heap = MyHeap()
-    # MyHeap.build_heap(heap, list)
-    # heap.insert(8, 10)
-    # heap.insert(4, 14)
-    # heap.insert(7, 15)
-    # heap.print_heap(sys.stdout)
-    # print()
-    # heap.set(8, 11)
-    # heap.print_heap(sys.stdout)
-    # print()
-    # heap.insert(3, 13)
-    # heap.print_heap(sys.stdout)
-    # print()
-    #
-    # heap.insert(5, 16)
-    # heap.insert(10, 10)
-    # heap.print_heap(sys.stdout)
-    # print()
-    #
-    # heap.delete(11)
-    # heap.print_heap(sys.stdout)
-    # heap.extract()
-    #
-    # heap.print_heap(sys.stdout)
-    # heap.extract()
-    # heap.print_heap(sys.stdout)
-    # print(str(heap.get_max()))
 
     for line in sys.stdin:
         line = line.rstrip('\r\n')
