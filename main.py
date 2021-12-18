@@ -77,7 +77,7 @@ class MyHeap:
             return min
 
     def find(self, key):
-        return self.map[key]
+        return self.map.get(key)
 
     def delete(self, key):
         iter = self.find(key)
@@ -121,7 +121,6 @@ class MyHeap:
     def set(self, key, new_val):
         iter = self.map[key]
         self.array[iter].value = new_val
-
 
     def print_level(self, start, end, level_number, out):
         if end < self.size:
@@ -167,6 +166,66 @@ def main():
     heap.print_heap(sys.stdout)
 
     print(str(heap.get_max()))
+
+    for line in sys.stdin:
+        line = line.rstrip('\r\n')
+        if "add" in line:
+            if len(line.split()) == 3:
+                heap.insert(line.split()[1], line.split()[2])
+            else:
+                print("error", file=sys.stdout)
+
+        elif "set" in line:
+            if len(line.split()) == 3 and heap.size:
+                heap.set(line.split()[1], line.split()[2])
+            else:
+                print("error", file=sys.stdout)
+
+        elif "delete" in line:
+            if len(line.split()) == 2:
+                if heap.size:
+                    heap.delete(line.split()[1])
+                else:
+                    print("error", file=sys.stdout)
+            else:
+                print("error", file=sys.stdout)
+
+        elif "search " in line:
+            if heap.size == 0:
+                print('0', file=sys.stdout)
+            elif len(line.split()) == 2:
+                node_iter = heap.find(line.split()[1])
+                if not node_iter:
+                    print('0', file=sys.stdout)
+                else:
+                    print('1 ' + str(node_iter) + ' ' + str(heap.array[node_iter].value), file=sys.stdout)
+            else:
+                print("error", file=sys.stdout)
+
+        elif "min" == line:
+            if heap.size:
+                print(heap.get_min(), file=sys.stdout)
+            else:
+                print("error", file=sys.stdout)
+
+        elif "max" == line:
+            if heap.size:
+                print(heap.get_max(), file=sys.stdout)
+            else:
+                print("error", file=sys.stdout)
+
+        elif "extract" == line:
+            if heap.size:
+                node = heap.extract()
+                print(str(node.key) + ' ' + str(node.value), file=sys.stdout)
+
+        elif line == "print":
+            heap.print_heap(sys.stdout)
+
+        elif not (line and line.strip()):
+            continue
+        else:
+            print("error", file=sys.stdout)
 
 
 main()
