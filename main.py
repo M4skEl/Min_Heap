@@ -27,10 +27,10 @@ class MyHeap:
         right = 2 * iter + 2
         i_min = iter
 
-        if left < self.size and self.array[left].key < self.array[iter].key:
+        if left < self.size and int(self.array[left].key) < int(self.array[iter].key):
             i_min = left
 
-        if right < self.size and self.array[right].key < self.array[iter].key:
+        if right < self.size and int(self.array[right].key) < int(self.array[i_min].key):
             i_min = right
 
         if i_min != iter:
@@ -42,7 +42,7 @@ class MyHeap:
     def sift_up(self, iter):
         parent = int((iter - 1) / 2)
 
-        if self.array[iter].key < self.array[parent].key:
+        if int(self.array[iter].key) < int(self.array[parent].key):
             self.array[iter], self.array[parent] = self.array[parent], self.array[iter]
             self.map[self.array[iter].key], self.map[self.array[parent].key] = self.map[self.array[parent].key], \
                                                                                self.map[self.array[iter].key]
@@ -69,9 +69,10 @@ class MyHeap:
         else:
             min = self.array[0]
             self.size -= 1
-            self.array[0] = self.array[self.size]
+            self.array[0] = self.array[-1]
             self.array.pop()
             self.map[self.array[0].key] = 0
+            self.map.pop(min.key)
 
             self.sift_down(0)
             return min
@@ -81,6 +82,8 @@ class MyHeap:
 
     def delete(self, key):
         iter = self.find(key)
+        if iter == None:
+            return None
         parent = int((iter - 1) / 2)
         left = 2 * iter + 1
         right = 2 * iter + 2
@@ -94,14 +97,14 @@ class MyHeap:
         self.size -= 1
 
         if iter < self.size:
-            if self.array[iter].key < self.array[parent].key:
+            if int(self.array[iter].key) < int(self.array[parent].key):
                 self.sift_up(iter)
             else:
                 if left < self.size:
-                    if self.array[iter].key > self.array[left].key:
+                    if int(self.array[iter].key) > int(self.array[left].key):
                         self.sift_down(iter)
                 if right < self.size:
-                    if self.array[iter].key > self.array[right].key:
+                    if int(self.array[iter].key) > int(self.array[right].key):
                         self.sift_down(iter)
 
     def get_min(self):
@@ -114,7 +117,7 @@ class MyHeap:
         last_level = self.array[last_parent + 1: self.size]
         max = last_level[0]
         for elem in last_level:
-            if elem.key > max.key:
+            if int(elem.key) > int(max.key):
                 max = elem
         return str(max.key) + ' ' + str(self.map[max.key]) + ' ' + str(max.value)
 
@@ -132,51 +135,73 @@ class MyHeap:
 
         for i in range(len(level)):
             if isinstance(level[i], Node):
-                level[i].parent = self.array[int((i - 1) / 2)]
+                level[i].parent = self.array[int((i + start - 1) / 2)]
             print(str(level[i]), end=' ', file=out)
-        print()
+            if isinstance(level[i], Node):
+                level[i].parent = None
+        print(file=out)
         if end < self.size - 1:
             level_number += 1
 
-            self.print_level(end + 1, end + 2 ^ level_number, level_number, out)
+            self.print_level(end + 1, end + 2 ** level_number, level_number, out)
 
     def print_heap(self, out):
         if self.array:
             print(str(self.array[0]), file=out)
-            start = 1
-            end = start * 2
-            level_number = 1
-            self.print_level(start, end, level_number, out)
+            if self.size>1:
+                start = 1
+                end = start * 2
+                level_number = 1
+                self.print_level(start, end, level_number, out)
         else:
-            print('error', file=out)
+            print('_', file=out)
 
 
 def main():
     heap = MyHeap()
     # MyHeap.build_heap(heap, list)
-    heap.insert(6, 1)
-    heap.insert(14, 1)
-    heap.insert(10, 1)
-    heap.insert(8, 1)
-    heap.insert(7, 1)
-    heap.insert(11, 1)
-    heap.delete(11)
-    heap.extract()
-
-    heap.print_heap(sys.stdout)
-
-    print(str(heap.get_max()))
+    # heap.insert(8, 10)
+    # heap.insert(4, 14)
+    # heap.insert(7, 15)
+    # heap.print_heap(sys.stdout)
+    # print()
+    # heap.set(8, 11)
+    # heap.print_heap(sys.stdout)
+    # print()
+    # heap.insert(3, 13)
+    # heap.print_heap(sys.stdout)
+    # print()
+    #
+    # heap.insert(5, 16)
+    # heap.insert(10, 10)
+    # heap.print_heap(sys.stdout)
+    # print()
+    #
+    # heap.delete(11)
+    # heap.print_heap(sys.stdout)
+    # heap.extract()
+    #
+    # heap.print_heap(sys.stdout)
+    # heap.extract()
+    # heap.print_heap(sys.stdout)
+    # print(str(heap.get_max()))
 
     for line in sys.stdin:
         line = line.rstrip('\r\n')
         if "add" in line:
             if len(line.split()) == 3:
+                if heap.find(line.split()[1]):
+                    print("error", file=sys.stdout)
+                    continue
                 heap.insert(line.split()[1], line.split()[2])
             else:
                 print("error", file=sys.stdout)
 
         elif "set" in line:
             if len(line.split()) == 3 and heap.size:
+                if not heap.find(line.split()[1]):
+                    print("error", file=sys.stdout)
+                    continue
                 heap.set(line.split()[1], line.split()[2])
             else:
                 print("error", file=sys.stdout)
@@ -184,6 +209,9 @@ def main():
         elif "delete" in line:
             if len(line.split()) == 2:
                 if heap.size:
+                    if heap.find(line.split()[1]) == None:
+                        print("error", file=sys.stdout)
+                        continue
                     heap.delete(line.split()[1])
                 else:
                     print("error", file=sys.stdout)
@@ -195,7 +223,7 @@ def main():
                 print('0', file=sys.stdout)
             elif len(line.split()) == 2:
                 node_iter = heap.find(line.split()[1])
-                if not node_iter:
+                if node_iter == None:
                     print('0', file=sys.stdout)
                 else:
                     print('1 ' + str(node_iter) + ' ' + str(heap.array[node_iter].value), file=sys.stdout)
