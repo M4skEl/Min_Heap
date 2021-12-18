@@ -20,6 +20,7 @@ class MyHeap:
     def __init__(self):
         self.array = []
         self.size = 0
+        self.map = {}
 
     def sift_down(self, iter):
         left = 2 * iter + 1
@@ -34,6 +35,8 @@ class MyHeap:
 
         if i_min != iter:
             self.array[iter], self.array[i_min] = self.array[i_min], self.array[iter]
+            self.map[self.array[iter].key], self.map[self.array[i_min].key] = self.map[self.array[i_min].key], self.map[
+                self.array[iter].key]
             self.sift_down(i_min)
 
     def sift_up(self, iter):
@@ -41,6 +44,8 @@ class MyHeap:
 
         if self.array[iter].key < self.array[parent].key:
             self.array[iter], self.array[parent] = self.array[parent], self.array[iter]
+            self.map[self.array[iter].key], self.map[self.array[parent].key] = self.map[self.array[parent].key], \
+                                                                               self.map[self.array[iter].key]
             self.sift_up(parent)
 
     def build_heap(self, arr):
@@ -55,6 +60,7 @@ class MyHeap:
         self.size += 1
         node = Node(key, value)
         self.array.append(node)
+        self.map[node.key] = iter
         self.sift_up(iter)
 
     def extract(self):
@@ -67,6 +73,34 @@ class MyHeap:
             self.sift_down(0)
             return min
 
+    def find(self, key):
+        return self.map[key]
+
+    def delete(self, key):
+        iter = self.find(key)
+        parent = int((iter - 1) / 2)
+        left = 2 * iter + 1
+        right = 2 * iter + 2
+
+        self.array[iter], self.array[-1] = self.array[-1], self.array[iter]
+        self.map[self.array[iter].key], self.map[self.array[-1].key] = self.map[self.array[-1].key], self.map[
+            self.array[iter].key]
+
+        self.array.pop()
+        self.map.pop(key)
+        self.size -= 1
+
+        if iter < self.size:
+            if self.array[iter].key < self.array[parent].key:
+                self.sift_up(iter)
+            else:
+                if left < self.size:
+                    if self.array[iter].key > self.array[left].key:
+                        self.sift_down(iter)
+                if right < self.size:
+                    if self.array[iter].key > self.array[right].key:
+                        self.sift_down(iter)
+
 
 def main():
     # list = [6, 14, 10, 8, 7, 11]
@@ -78,6 +112,7 @@ def main():
     heap.insert(8, 1)
     heap.insert(7, 1)
     heap.insert(11, 1)
+    heap.delete(11)
     print(heap.array[0])
     print(heap.array[1])
     print(heap.array[2])
