@@ -22,7 +22,11 @@ class MyHeap:
             self.sift_down(i_min)
 
     def sift_up(self, iter):
-        pass
+        parent = int((iter - 1) / 2)
+
+        if self.array[iter] > self.array[parent]:
+            self.array[iter], self.array[parent] = self.array[parent], self.array[iter]
+            self.sift_up(parent)
 
     def build_heap(self, arr):
         self.size = len(arr)
@@ -38,7 +42,6 @@ def main():
     MyHeap.build_heap(heap, list)
 
     print(heap.array)
-
 
 
 main()
