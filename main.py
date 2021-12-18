@@ -69,7 +69,10 @@ class MyHeap:
         else:
             min = self.array[0]
             self.size -= 1
-            self.array[0] = self.array[self.size - 1]
+            self.array[0] = self.array[self.size]
+            self.array.pop()
+            self.map[self.array[0].key] = 0
+
             self.sift_down(0)
             return min
 
@@ -101,9 +104,55 @@ class MyHeap:
                     if self.array[iter].key > self.array[right].key:
                         self.sift_down(iter)
 
+    def get_min(self):
+        if self.size:
+            return str(self.array[0].key) + ' 0 ' + str(self.array[0].value)
+        return None
+
+    def get_max(self):
+        last_parent = int(self.size / 2) - 1
+        last_level = self.array[last_parent + 1: self.size]
+        max = last_level[0]
+        for elem in last_level:
+            if elem.key > max.key:
+                max = elem
+        return str(max.key) + ' ' + str(self.map[max.key]) + ' ' + str(max.value)
+
+    def set(self, key, new_val):
+        iter = self.map[key]
+        self.array[iter].value = new_val
+
+
+    def print_level(self, start, end, level_number, out):
+        if end < self.size:
+            level = self.array[start:end + 1]
+        else:
+            level = self.array[start:self.size]
+            for j in range(end - self.size + 1):
+                level.append('_')
+
+        for i in range(len(level)):
+            if isinstance(level[i], Node):
+                level[i].parent = self.array[int((i - 1) / 2)]
+            print(str(level[i]), end=' ', file=out)
+        print()
+        if end < self.size - 1:
+            level_number += 1
+
+            self.print_level(end + 1, end + 2 ^ level_number, level_number, out)
+
+    def print_heap(self, out):
+        if self.array:
+            print(str(self.array[0]), file=out)
+            start = 1
+            end = start * 2
+            level_number = 1
+            self.print_level(start, end, level_number, out)
+        else:
+            print('error', file=out)
+
 
 def main():
-    # list = [6, 14, 10, 8, 7, 11]
     heap = MyHeap()
     # MyHeap.build_heap(heap, list)
     heap.insert(6, 1)
@@ -113,12 +162,11 @@ def main():
     heap.insert(7, 1)
     heap.insert(11, 1)
     heap.delete(11)
-    print(heap.array[0])
-    print(heap.array[1])
-    print(heap.array[2])
-    print(heap.array[3])
-    print(heap.array[4])
-    print(heap.array[5])
+    heap.extract()
+
+    heap.print_heap(sys.stdout)
+
+    print(str(heap.get_max()))
 
 
 main()
